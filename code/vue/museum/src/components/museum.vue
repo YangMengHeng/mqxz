@@ -10,7 +10,7 @@
                   width="800"
                   trigger="click"
                   >
-                    <img src="../assets/01.jpg" class="areaDetailImage">
+                    <img :src="areaImageUrl[0]" class="areaDetailImage">
                     <div class="internalTextDiv1">
                       <p>实时访问人数：{{currentCount[0].currentCount}}人</p>
                       <p>今日访问人数：{{dayCount[0].dayCount}}人</p>
@@ -42,7 +42,7 @@
                   width="800"
                   trigger="click"
                   >
-                    <img src="../assets/02.jpg" class="areaDetailImage">
+                    <img :src=areaImageUrl[1] class="areaDetailImage">
                     <div class="internalTextDiv2">
                       <p>实时访问人数：{{currentCount[1].currentCount}}人</p>
                       <p>今日访问人数：{{dayCount[1].dayCount}}人</p>
@@ -76,7 +76,7 @@
                   width="800"
                   trigger="click"
                   >
-                    <img src="../assets/03.jpg" class="areaDetailImage">
+                    <img :src=areaImageUrl[2] class="areaDetailImage">
                     <div class="internalTextDiv3">
                       <p>实时访问人数：{{currentCount[2].currentCount}}人</p>
                       <p>今日访问人数：{{dayCount[2].dayCount}}人</p>
@@ -108,7 +108,7 @@
                   width="800"
                   trigger="click"
                   >
-                    <img src="../assets/04.jpg" class="areaDetailImage">
+                    <img :src=areaImageUrl[3] class="areaDetailImage">
                     <div class="internalTextDiv4">
                       <p>实时访问人数：{{currentCount[3].currentCount}}人</p>
                       <p>今日访问人数：{{dayCount[3].dayCount}}人</p>
@@ -140,10 +140,10 @@ export default {
   props: {},
   data() {
     let areaImageUrl = [
-      '../assets/01.jpg',
-      '../assets/02.jpg',
-      '../assets/03.jpg',
-      '../assets/04.jpg'
+      require("../assets/01.jpg"),
+      require("../assets/02.jpg"),
+      require("../assets/03.jpg"),
+      require("../assets/04.jpg")
     ]
     let currentCount = [0, 0, 0, 0]
     let dayCount = [0, 0, 0, 0]
@@ -154,41 +154,41 @@ export default {
     return {areaImageUrl, currentCount, dayCount, historyCount, monthCount, yearCount};
   },
   beforeCreate(){
-    this.$axios.get('api/data/area/currentCount')
+    this.$axios.get("api/data/area/currentCount")
       .then((result) => {
-        console.log('current', result.data)
+        // console.log("current", result.data)
         this.currentCount = result.data.data
       }).catch((err) => {
         console.log(err)
       });
 
-      this.$axios.get('api/data/area/dayCount')
+      this.$axios.get("api/data/area/dayCount")
       .then((result) => {
-        console.log('day', result.data)
+        console.log("day", result.data)
         this.dayCount = result.data.data
       }).catch((err) => {
         console.log(err)
       });
 
-      this.$axios.get('api/data/area/historyCount')
+      this.$axios.get("api/data/area/historyCount")
       .then((result) => {
-        console.log('history', result.data)
+        console.log("history", result.data)
         this.historyCount = result.data.data
       }).catch((err) => {
         console.log(err)
       });
 
-      this.$axios.get('api/data/area/monthCount')
+      this.$axios.get("api/data/area/monthCount")
       .then((result) => {
-        console.log('month', result.data)
+        console.log("month", result.data)
         this.monthCount = result.data.data
       }).catch((err) => {
         console.log(err)
       });
 
-      this.$axios.get('api/data/area/yearCount')
+      this.$axios.get("api/data/area/yearCount")
       .then((result) => {
-        console.log('year', result.data)
+        console.log("year", result.data)
         this.yearCount = result.data.data
       }).catch((err) => {
         console.log(err)
