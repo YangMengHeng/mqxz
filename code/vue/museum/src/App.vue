@@ -1,21 +1,21 @@
 <template>
   <div id="app">
-    <!-- <museum></museum> -->
+    <museum></museum>
     <!-- <TestComponent></TestComponent> -->
-    <objectTrace></objectTrace>
+    <!-- <objectTrace></objectTrace> -->
   </div>
 </template>
 
 <script>
-import objectTrace from './components/objectTrace.vue'
-// import museum from './components/museum.vue'
+// import objectTrace from './components/objectTrace.vue'
+import museum from './components/museum.vue'
 // import TestComponent from './components/TestComponent.vue'
 
 export default {
   name: 'App',
   components: {
-    objectTrace
-    // museum
+    // objectTrace
+    museum
   }
 }
 </script>

@@ -156,7 +156,7 @@ export default {
   beforeCreate(){
     this.$axios.get("api/data/area/currentCount")
       .then((result) => {
-        // console.log("current", result.data)
+        console.log("current", result.data)
         this.currentCount = result.data.data
       }).catch((err) => {
         console.log(err)

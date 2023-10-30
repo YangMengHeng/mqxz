@@ -2,7 +2,7 @@
 <div :style="{ backgroundImage: 'url('+ imageUrl +')' }">
 
 <br/><br/><br/><br/><br/><br/><br/>
-<center :style="{fontSize: topicfontSize }">欢迎参观博物馆</center>  
+<center :style="{fontSize: topicfontSize }">TEST</center>  
 <br/><br/><br/><br/>
 <center :style="{fontSize: fontSize }">今日访客{{todayVisitors}}</center>  
 <br/><br/>

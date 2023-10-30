@@ -24,7 +24,7 @@
                 :on-change="handleUploadFileChange"
                 :on-remove="handleUploadFileRemove"
                 >
-                <el-button slot="trigger" type="primary">上传追踪者照片</el-button>
+                <el-button slot="trigger" type="plain" icon="el-icon-circle-plus-outline">上传追踪者照片</el-button>
                 <el-row class="menuInterval">
                   <el-image :src=traceImage :style="{width: objectImgWidth,height:objectImgHeight}">
                     <div slot="placeholder" class="image-slot">
@@ -33,12 +33,14 @@
                   </el-image>
                 </el-row>
                 <el-button type="success" @click="submitUpload"
-                class="menuInterval">提交追踪任务</el-button>
+                class="menuInterval"
+                icon="el-icon-upload2"
+                :disabled=isSubmitStatus>提交追踪任务</el-button>
                 <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过2MB</div>
               </el-upload>
             </el-row>
             <el-row>
-              <el-button @click="test">test</el-button>
+              <el-button @click="test" :disabled=isSubmitStatus>test</el-button>
             </el-row>
           </el-card>
         </el-container>
@@ -87,6 +89,7 @@
 
 <script>
 import LeaderLine from 'leader-line'
+import moment from 'moment'
 
 export default {
   name: 'TestComponent',
@@ -111,9 +114,11 @@ export default {
     let traceImage = 'https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg'
     let objectImgWidth = '245px'
     let objectImgHeight = '300px'
+    let objectPicUrl = ''
+    let isSubmitStatus = false
 
       return {isTaskBegin, cameraPos, mapImageUrl, imageList, fileList, serverUrl, taskID, taskStatus, taskIndex, progressPercent, timeout, intervalList, LeaderLine, traceImage,
-      objectImgWidth, objectImgHeight,
+      objectImgWidth, objectImgHeight, objectPicUrl, isSubmitStatus,
       pickerOptions: {
           shortcuts: [{
             text: '最近一周',
@@ -146,7 +151,7 @@ export default {
   },
 
   mounted(){
-    this.$refs.leftMenuCard.$el.style.height = this.$refs.mapImage.$el.clientHeight + 'px'
+    this.$refs.leftMenuCard.$el.style.minheight = this.$refs.mapImage.$el.clientHeight + 'px'
   },
   created(){
     console.log('created')
@@ -158,10 +163,14 @@ export default {
 
   methods:{
     test(){
-      console.log('time', this.timeValue)
-      console.log('timeV', this.timeValue[0] instanceof Date)
-      console.log('0 v', this.timeValue[0].valueOf())
-      console.log('1 v', this.timeValue[1].valueOf())
+      moment
+      // console.log('time', this.timeValue)
+      // console.log('start v', this.timeValue[0].valueOf())
+      // console.log('end v', this.timeValue[1].valueOf())
+      // console.log('test', moment(this.timeValue[0]).format('YYYY-MM-DD HH:MM:SS'))
+      // console.log('before', this.isSubmitStatus)
+      // this.isSubmitStatus = !this.isSubmitStatus
+      // console.log('after', this.isSubmitStatus)
     },
 
     cameraInitiation(){
@@ -219,32 +228,66 @@ export default {
       return true
     },
 
-    createTask(tmpFileList){
-      console.log('createTask')
-      console.log('tmpFileList', tmpFileList)
-      // 在这里创建任务，把后端需要的数据进行组装打包发过去
-      let transferData = {
-        'task': this.createRandom(10, 16),
-        'file': tmpFileList[0],
-      }
-      console.log('transferData', transferData)
-      // 记得要发送axios请求到后端
-      let tmp = {
-      'taskName': 'test1',
-      'taskImgs': 'https://img95.699pic.com/photo/50147/2119.jpg_wh860.jpg'
-      }
-      this.$axios({
-      url:"http://192.168.1.171:8080/task/handleTask",
-      method:"post",
-      data: tmp,
+    async uploadAttachment(params){
+      // console.log('uploadAttachment params', params)
+      await this.$axios.post('api/file/file/anyone/upload', params,{
+        headers:{
+          'Content-Type': 'multipart/form-data'
+        }
       }).then(response=>{
         console.log('success', response)
+        // console.log(response.data.data.url)
+        this.objectPicUrl = response.data.data.url.substring(response.data.data.url.length + 1, response.data.data.url.indexOf("group"))
       }).catch(error=>{
         console.log('error', error)
       });
-    console.log('down ...................')
+    },
 
-      return transferData['task']
+      async releaseTask(params){
+      console.log('release task', params)
+      await this.$axios.post('api/task/release/task', params, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(response=>{
+        console.log('success', response)
+        this.isSubmitStatus = true
+        this.taskIndex = 1
+        this.$message({
+          message: '追踪任务提交成功！请勿离开当前页面否则任务失败！',
+          type: 'success'
+        })
+        // this.taskID.push(tmpTaskID)
+      }).catch(error=>{
+        console.log('error', error)
+      });
+    },
+
+    async createTask(tmpFileList){
+      console.log('createTask')
+      console.log('tmpFileList', tmpFileList)
+      // console.log('test', tmpFileList[0].raw instanceof File)
+      // console.log('raw', tmpFileList[0].raw)
+      // 创建追踪任务前先上传追踪者图片,第一步准备接口参数
+      let formData = new FormData()
+      formData.append('file', tmpFileList[0].raw)
+      formData.append('bizType', 'filetransfer')
+      formData.append('bucket', 'filetransfer')
+      formData.append('storageType', 'FAST_DFS')
+      // 使用同步请求上传附件
+      await this.uploadAttachment(formData)
+
+      console.log('objectPicUrl', this.objectPicUrl)
+
+      // 发布任务
+      let params = {
+      'end': '2023-09-14 09:59:33',
+      'start': '2023-09-14 09:50:33',
+      'url': this.objectPicUrl
+      }
+
+      await this.releaseTask(params)
+      console.log('down ...................')
     },
 
     tmpQuery(){
@@ -278,42 +321,6 @@ export default {
       this.intervalList.push(this.progressPercent)
 
       return true
-    },
-
-    taskPoll(task, curTime){
-      console.log('taskPoll', task)
-      // console.log('curTime', curTime)
-      let lastTime = 0
-      // console.log('before', this.progressPercent)
-
-      // 封装axios请求
-      this.progressPercent = this.progressPercent + Math.round(Math.random() * 10)
-      // console.log('after', this.progressPercent)
-
-      // 判断任务是否已经完成
-      if(this.progressPercent >= 100){
-        this.intervalList.forEach((item) =>{
-          clearInterval(item)
-        })
-        this.intervalList = []
-        this.progressPercent = 100
-        this.taskIndex = 2
-
-        return true
-      }
-
-      lastTime = Date.now()
-      console.log('lastTime', lastTime)
-      if((lastTime - curTime) > this.timeout){
-        this.intervalList.forEach((item) =>{
-          clearInterval(item)
-        })
-        this.intervalList = []
-        this.progressPercent = 0
-        this.taskIndex = 0
-        this.$message.error('任务处理超时失败！请检查网络！')
-        return false
-      }
     },
 
     getTaskResult(){
@@ -355,23 +362,18 @@ export default {
     },
 
     submitUpload(){
-      console.log('submit')
+      console.log('submit task')
       console.log('fileList', this.fileList)
-      let tmpTaskID
-      if(this.fileList.length == 0){
+      if(this.fileList.length <= 0){
         this.$message.error('开始追踪任务前请提交追踪者照片！')
         return
       }
 
-      if((tmpTaskID = this.createTask(this.fileList)) != false){
-        // console.log('success!')
-        this.taskIndex = 1
-        this.$message({
-          message: '追踪任务提交成功！请勿离开当前页面否则任务失败！',
-          type: 'success'
-        })
-        this.taskID.push(tmpTaskID)
-      }
+      this.createTask(this.fileList)
+
+      // if(this.taskID.size() != 0)
+      //   this.taskID.push(tmpTaskID)
+      // }
       console.log('taskID', this.taskID)
 
       // if(this.queryTask(this.taskID) == true){
