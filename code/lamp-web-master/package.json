@@ -16,7 +16,8 @@
     "lint": "eslint --fix --ext .js,.vue src",
     "svgo": "svgo -f src/icons/svg --config=src/icons/svgo.yml",
     "fix-memory-limit": "cross-env LIMIT=3072  increase-memory-limit",
-    "new": "plop"
+    "new": "plop",
+    "unpack": "npm pack"
   },
   "dependencies": {
     "@riophae/vue-treeselect": "0.0.38",

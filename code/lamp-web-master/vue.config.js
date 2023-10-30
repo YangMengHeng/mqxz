@@ -29,7 +29,7 @@ module.exports = {
    * Detail: https://cli.vuejs.org/config/#publicpath
    */
   publicPath: './',
-  outputDir: 'dist',
+  outputDir: 'lamp-web',
   // outputDir: process.env.VUE_APP_PROJECT_NAME,
   assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV === 'development',
