@@ -19,7 +19,7 @@
 <center :style="{fontSize: fontSize }">区域本年访客{{areayearNums}}</center>
 <center :style="{fontSize: fontSize }">区域历史访客{{areahistorys}}</center>
 
-<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+<br/><br/><br/><br/><br/><br/><br/ ><br/><br/><br/>
 </div>
   </template>
 
@@ -81,7 +81,7 @@ unmounted() {
 url:'/api/data/miniute/todayVisitor'}).then(response => {
       if(response.data.data == null)
           this.todayVisitors = 0;
-        else  
+        else
         this.todayVisitors=response.data.data;
           console.log(response)
             //在这里编写请求发送成功后后端传送回来的数据，存在response里，你用console查看
