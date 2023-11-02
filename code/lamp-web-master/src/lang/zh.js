@@ -41,6 +41,16 @@ export default {
       limitEnd: '限制时间止',
       state: '状态',
     },
+    camera: {
+      camId: "摄像头ID",
+      camName: "摄像头名称",
+      camPosX: "摄像头X坐标",
+      camPosY: "摄像头Y坐标",
+      camStatus: "摄像头状态",
+      add: "添加摄像头",
+      delete: "删除",
+      edit: "编辑摄像头"
+    },
     rateLimiter: {
       id: 'ID',
       count: '次数',
@@ -602,5 +612,5 @@ export default {
     current: '当前',
     socialAccount: '账号',
     socialTips: '尚未绑定任何系统账户，您可以绑定系统账户或者注册一个新的账户并绑定。'
-  }
+  },
 }

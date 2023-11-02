@@ -41,6 +41,16 @@ export default {
       limitEnd: 'limitTo',
       state: 'state',
     },
+    camera: {
+      camId: "摄像头ID",
+      camName: "摄像头名称",
+      camPosX: "摄像头X坐标",
+      camPosY: "摄像头Y坐标",
+      camStatus: "摄像头状态",
+      add: "添加摄像头",
+      delete: "删除",
+      edit: "编辑摄像头"
+    },
     rateLimiter: {
       id: 'ID',
       count: 'count',
@@ -601,5 +611,5 @@ export default {
     current: 'Current ',
     socialAccount: ' account ',
     socialTips: ' haven\'t bound any system accounts yet, you can bind system accounts or register a new account and bind.'
-  }
+  },
 }

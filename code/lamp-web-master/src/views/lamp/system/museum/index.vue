@@ -1,267 +1,429 @@
 <template>
-<div :style="{ backgroundImage: 'url('+ imageUrl +')' }">
+  <div class="app-container">
+    <!--    表格上方一行的有关功能-->
+    <div class="filter-container">
+      <!--      搜索 摄像头ID栏-->
+      <el-input
+          v-model="queryParams.model.camId"
+          :placeholder="$t('table.camera.camId')"
+          class="filter-item search-item"
+      />
+      <!--      搜索 摄像头名称栏-->
+      <el-input
+          v-model="queryParams.model.camName"
+          :placeholder="$t('table.camera.camName')"
+          class="filter-item search-item"
+      />
+      <!--      搜索 摄像头X坐标栏-->
+      <el-input
+          v-model="queryParams.model.camPosX"
+          :placeholder="$t('table.camera.camPosX')"
+          class="filter-item search-item"
+      />
+      <!--      搜索 摄像头Y坐标栏-->
+      <el-input
+          v-model="queryParams.model.camPosY"
+          :placeholder="$t('table.camera.camPosY')"
+          class="filter-item search-item"
+      />
+      <!--      搜索 摄像头状态栏-->
+      <el-input
+          v-model="queryParams.model.camStatus"
+          :placeholder="$t('table.camera.camStatus')"
+          class="filter-item search-item"
+      />
 
-<br/><br/><br/><br/><br/><br/><br/>
-<center :style="{fontSize: topicfontSize }">TEST</center>  
-<br/><br/><br/><br/>
-<center :style="{fontSize: fontSize }">今日访客{{todayVisitors}}</center>  
-<br/><br/>
-<center :style="{fontSize: fontSize }">馆内人数{{currentNums}}          本月访客{{monthNums}}</center>
-<br/><br/>
-<center :style="{fontSize: fontSize }">今年访客{{yearNums}}          历史访客{{historys}}</center>
-<br/><br/><br/>
 
+      <!--搜索 按钮-->
+      <el-button
+          class="filter-item"
+          plain
+          type="primary"
+          @click="search"
+      >
+        {{ $t("table.search") }}
+      </el-button>
 
-<center :style="{fontSize: fontSize }">区域{{id}}</center>
-<center :style="{fontSize: fontSize }">区域今日访客{{areatodayVisitors}}</center>
-<center :style="{fontSize: fontSize }">区域实时人数{{areacurrentNums}}</center>
-<center :style="{fontSize: fontSize }">区域本月访客{{areamonthNums}}</center>
-<center :style="{fontSize: fontSize }">区域本年访客{{areayearNums}}</center>
-<center :style="{fontSize: fontSize }">区域历史访客{{areahistorys}}</center>
+      <!--添加摄像头 按钮-->
+      <el-button
+          class="filter-item"
+          plain
+          type="danger"
+          @click="add"
+      >
+        {{ $t("table.camera.add") }}
+      </el-button>
 
-<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-</div>
-  </template>
+    </div>
+
+    <!--表格-->
+    <el-table
+        :key="tableKey"
+        ref="table"
+        v-loading="loading"
+        :data="tableData.records"
+        border
+        fit
+        row-key="id"
+        style="width: 100%;"
+        @filter-change="filterChange"
+        @selection-change="onSelectChange"
+        @sort-change="sortChange"
+        @cell-click="cellClick"
+    >
+      <!--      表头 全选框-->
+      <el-table-column
+          align="center"
+          type="selection"
+          width="40px"
+          :reserve-selection="true"
+      />
+      <!--      表列 摄像头ID-->
+      <el-table-column
+          :label="$t('table.camera.camId')"
+          :show-overflow-tooltip="true"
+          align="center"
+          prop="camId"
+          width=""
+      >
+        <template slot-scope="scope">
+          <span>{{ scope.row.id }}</span>
+        </template>
+      </el-table-column>
+      <!--      表列 摄像头名称-->
+      <el-table-column
+          :label="$t('table.camera.camName')"
+          :show-overflow-tooltip="true"
+          align="center"
+          prop="camName"
+          width=""
+      >
+        <template slot-scope="scope">
+          <span>{{ scope.row.camName }}</span>
+        </template>
+      </el-table-column>
+      <!--      表列 摄像头X坐标-->
+      <el-table-column
+          :label="$t('table.camera.camPosX')"
+          :show-overflow-tooltip="true"
+          align="center"
+          prop="camPosX"
+          width=""
+      >
+        <template slot-scope="scope">
+          <span>{{ scope.row.camPosX }}</span>
+        </template>
+      </el-table-column>
+      <!--      表列 摄像头Y坐标-->
+      <el-table-column
+          :label="$t('table.camera.camPosY')"
+          :show-overflow-tooltip="true"
+          align="center"
+          prop="camPosY"
+          width=""
+      >
+        <template slot-scope="scope">
+          <span>{{ scope.row.camPosY }}</span>
+        </template>
+      </el-table-column>
+      <!--      表列 摄像头状态-->
+      <el-table-column
+          :label="$t('table.camera.camStatus')"
+          :show-overflow-tooltip="true"
+          align="center"
+          prop="camStatus"
+          width=""
+      >
+        <template slot-scope="scope">
+          <span>{{ scope.row.camStatus }}</span>
+        </template>
+      </el-table-column>
+
+      <!--单行的操作按钮-->
+      <el-table-column
+          :label="$t('table.operation')"
+          column-key="operation"
+          align="center"
+          class-name="small-padding fixed-width"
+          width="100px"
+      >
+        <template slot-scope="{ row }">
+          <!--          <i-->
+          <!--            class="el-icon-copy-document table-operation"-->
+          <!--            :title="$t('common.delete')"-->
+          <!--            style="color: #2db7f5;"-->
+          <!--            @click="copy(row)"-->
+          <!--          />-->
+          <i
+              class="el-icon-edit table-operation"
+              :title="$t('table.camera.edit')"
+              style="color: #2db7f5;"
+              @click="edit(row)"
+          />
+          <i
+              class="el-icon-delete table-operation"
+              :title="$t('table.camera.delete')"
+              style="color: #f50;"
+              @click="singleDelete(row)"
+          />
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <!--表格页数设置-->
+    <pagination
+        v-show="tableData.total > 0"
+        :limit.sync="queryParams.size"
+        :page.sync="queryParams.current"
+        :total="Number(tableData.total)"
+        @pagination="fetch"
+    />
+
+    <!--添加界面-->
+    <encState-edit
+        ref="edit"
+        :dialog-visible="dialog.isVisible"
+        :type="dialog.type"
+        @close="editClose"
+        @success="editSuccess"
+    />
+
+    <!--应该用不上的-->
+    <file-import
+        ref="import"
+        :dialog-visible="fileImport.isVisible"
+        :type="fileImport.type"
+        :action="fileImport.action"
+        accept=".xls,.xlsx"
+        @close="importClose"
+        @success="importSuccess"
+    />
+    <el-dialog
+        v-el-drag-dialog
+        :close-on-click-modal="false"
+        :close-on-press-escape="true"
+        title="预览"
+        width="80%"
+        top="50px"
+        :visible.sync="preview.isVisible"
+    >
+      <el-scrollbar>
+        <div v-html="preview.context" />
+      </el-scrollbar>
+    </el-dialog>
+  </div>
+</template>
 
 <script>
+import Pagination from "@/components/Pagination";
+import encStateEdit from "./edit";
+import cameraApi from "@/api/Camera.js";
+import elDragDialog from '@/directive/el-drag-dialog'
+import FileImport from "@/components/lamp/Import"
+import {downloadFile, initQueryParams} from '@/utils/commons'
 
 export default {
-  name: 'testComponent',
-  data(){
- 
+  name: "EncStateManage",
+  directives: {elDragDialog},
+  components: {Pagination, encStateEdit, FileImport},
+  filters: {},
+  data() {
     return {
-    
-      todayVisitors : 0,
-      currentNums : 0,
-      monthNums : 0,
-      yearNums : 0,
-      historys : 0,
-
-      
-      id : [],
-      areatodayVisitors : [],
-      areacurrentNums : [],
-      areayearNums : [],
-      areahistorys : [],
-      areamonthNums : [],
-     
-
-      topicfontSize:"60px",
-      fontSize:"28px",
-      imageUrl: require('@/assets/picture.png'),
-      intervalId:null,
-      
-    }
-},
-mounted() {
-    this.getVisitors();
-    this.currentNum();
-    this.history();
-    this.monthNum();
-    this.yearNum(); // 在组件加载完成后发送API请求
-    this.getId();
-    this.areacurrentNum();
-    this.areayearNum();
-    this.areahistory();
-    this.areamonthNum();
-    this.areagetVisitors();
-   
+      dialog: {
+        isVisible: false,
+        type: "add"
+      },
+      preview: {
+        isVisible: false,
+        context: ''
+      },
+      fileImport: {
+        isVisible: false,
+        type: "import",
+        action: `${process.env.VUE_APP_BASE_API}/authority/encState/import`
+        //action: `${process.env.VUE_APP_BASE_API}/enc/encadd`                        //修改
+      },
+      tableKey: 0,
+      queryParams: initQueryParams({
+        model: {}
+      }),
+      selection: [],
+      loading: false,
+      tableData: {
+        total: 0
+      },
+    };
   },
-  
-created(){
-   this.dataRefreh();
-},
-unmounted() {
-   // 销毁组件之前，清除计时器
-   this.clear();
-},
-  methods:{
-    getVisitors(){
-      this.$axios({method:'get',
-url:'/api/data/miniute/todayVisitor'}).then(response => {
-      if(response.data.data == null)
-          this.todayVisitors = 0;
-        else  
-        this.todayVisitors=response.data.data;
-          console.log(response)
-            //在这里编写请求发送成功后后端传送回来的数据，存在response里，你用console查看
-            })
-           .catch(error => {
-console.error(error)
-	//这里是请求失败后的处理，相关信息在error里
-	})
+  computed: {},
+  watch: {},
+  mounted() {
+    this.fetch();
+  },
+  methods: {
+    editClose() {
+      this.dialog.isVisible  = false;
     },
-
-    areagetVisitors(){
-      this.$axios({method:'get',
-url:'/api/data/area/dayCount'}).then(response => {
-      if(response.data.data== null)
-          this.areatodayVisitors = 0;
-        else  
-      
-        for (var count= 0 ; count < response.data.data.length ; count++){
-
-          this.areatodayVisitors.push(response.data.data[count]['dayCount']);
-
-}
-      
-          console.log(response)
-            //在这里编写请求发送成功后后端传送回来的数据，存在response里，你用console查看
-            })
-           .catch(error => {
-console.error(error)
-	//这里是请求失败后的处理，相关信息在error里
-	})
+    editSuccess() {
+      this.search();
     },
-
-    getId(){
-      this.$axios({method:'get',
-url:'/api/data/area/dayCount'}).then(response => {
-      if(response.data.data== null)
-          this.areatodayVisitors = 0;
-        else  
-      
-        this.id =  response.data.data.length;
-      
-          console.log(response)
-            //在这里编写请求发送成功后后端传送回来的数据，存在response里，你用console查看
-            })
-           .catch(error => {
-console.error(error)
-	//这里是请求失败后的处理，相关信息在error里
-	})
+    onSelectChange(selection) {
+      this.selection = selection;
     },
-currentNum(){
-  this.$axios.get('/api/data/miniute/currentNum').then(response => {
-          this.currentNums = response.data.data;
-          console.log(response)
-            //在这里编写请求发送成功后后端传送回来的数据，存在response里，你用console查看
-            })
-           .catch(error => {
-console.error(error)
-	//这里是请求失败后的处理，相关信息在error里
-	})
+    search() {
+      this.fetch({
+        ...this.queryParams
+      });
     },
-
-    areacurrentNum(){
-  this.$axios.get('/api/data/area/currentCount').then(response => {
-
-    for(var count= 0 ; count < response.data.data.length ; count++){
-
-this.areacurrentNums.push(response.data.data[count]['currentCount']);
-
-}
-          console.log(response)
-            //在这里编写请求发送成功后后端传送回来的数据，存在response里，你用console查看
-            })
-           .catch(error => {
-console.error(error)
-	//这里是请求失败后的处理，相关信息在error里
-	})
+    reset() {
+      this.queryParams = initQueryParams({});
+      this.$refs.table.clearSort();
+      this.$refs.table.clearFilter();
+      this.search();
     },
-history(){
-  this.$axios.get('/api/data/month/history') .then(response => {
-          this.historys = response.data.data;
-          console.log(response)
-            //在这里编写请求发送成功后后端传送回来的数据，存在response里，你用console查看
-            })
-           .catch(error => {
-console.error(error)
-	//这里是请求失败后的处理，相关信息在error里
-	})
+    exportExcelPreview() {
+      if (this.queryParams.timeRange) {
+        this.queryParams.extra.createTime_st = this.queryParams.timeRange[0];
+        this.queryParams.extra.createTime_ed = this.queryParams.timeRange[1];
+      }
+      this.queryParams.extra.fileName = '导出参数数据';
+      cameraApi.preview(this.queryParams).then(response => {
+        const res = response.data;
+        this.preview.isVisible = true;
+        this.preview.context = res.data;
+      });
     },
-    areahistory(){
-  this.$axios.get('/api/data/area/historyCount') .then(response => {
-  
-          for(var count= 0 ; count< response.data.data.length ; count++){
-
-            this.areahistorys.push(response.data.data[count]['yearCount']);
-          
-          }
-          console.log(response)
-            //在这里编写请求发送成功后后端传送回来的数据，存在response里，你用console查看
-            })
-           .catch(error => {
-console.error(error)
-	//这里是请求失败后的处理，相关信息在error里
-	})
+    exportExcel() {
+      if (this.queryParams.timeRange) {
+        this.queryParams.extra.createTime_st = this.queryParams.timeRange[0];
+        this.queryParams.extra.createTime_ed = this.queryParams.timeRange[1];
+      }
+      this.queryParams.extra.fileName = '导出参数数据';
+      cameraApi.export(this.queryParams).then(response => {
+        downloadFile(response);
+      });
     },
-
-monthNum(){
-  this.$axios({method:'get',
-url:'/api/data/month/monthNum'}) .then(response => {
-          this.monthNums = response.data.data;
-          console.log(response)
-            //在这里编写请求发送成功后后端传送回来的数据，存在response里，你用console查看
-            })
-           .catch(error => {
-console.error(error)
-	//这里是请求失败后的处理，相关信息在error里
-	})
+    importExcel() {
+      this.fileImport.type = "upload";
+      this.fileImport.isVisible = true;
+      this.$refs.import.setModel(false);
     },
-    areamonthNum(){
-  this.$axios({method:'get',
-url:'/api/data/area/monthCount'}) .then(response => {
-  for(var count= 0 ; count< (response.data.data).length ; count++){
-            this.areamonthNums.push(response.data.data[count]['monthCount']);
-          }
-
-          console.log(response)
-            //在这里编写请求发送成功后后端传送回来的数据，存在response里，你用console查看
-            })
-           .catch(error => {
-console.error(error)
-	//这里是请求失败后的处理，相关信息在error里
-	})
+    importSuccess() {
+      this.search();
     },
-
-yearNum(){
-  this.$axios.get('/api/data/month/yearNum').then(response => {
-          this.yearNums = response.data.data;
-          console.log(response)
-            //在这里编写请求发送成功后后端传送回来的数据，存在response里，你用console查看
-            })
-           .catch(error => {
-console.error(error)
-	//这里是请求失败后的处理，相关信息在error里
-	})
+    importClose() {
+      this.fileImport.isVisible = false;
     },
-
-    areayearNum(){
-  this.$axios.get('/api/data/area/yearCount').then(response => {
-       
-          for(var count= 0 ; count< (response.data.data).length ; count++){
-            this.areayearNums.push(response.data.data[count]['yearCount']);
-          }
-
-          //this.areayearNums = response.data.data;
-          console.log(response)
-            //在这里编写请求发送成功后后端传送回来的数据，存在response里，你用console查看
-            })
-           .catch(error => {
-console.error(error)
-	//这里是请求失败后的处理，相关信息在error里
-	})
+    singleDelete(row) {
+      this.$refs.table.clearSelection();
+      this.$refs.table.toggleRowSelection(row, true);
+      this.batchDelete();
     },
-
-    dataRefreh() {
-     // 计时器正在进行中，退出函数
-     if (this.intervalId != null) {
+    batchDelete() {
+      if (!this.selection.length) {
+        this.$message({
+          message: this.$t("tips.noDataSelected"),
+          type: "warning"
+        });
         return;
-     }
-      // 计时器为空，操作
-      this.intervalId = setInterval(() => {
-         console.log("刷新" + new Date());
-         this.dataRefreh();
-         this.$router.go(0)  //每1分钟调用方法刷新一次页面，进行数据更新
-        }, 60000);
-      }, 
-      // 停止定时器
-      clear() {
-        clearInterval(this.intervalId);//清除计时器
-        this.intervalId = null; //设置为null
+      }
+      this.$confirm(this.$t("tips.confirmDelete"), this.$t("common.tips"), {
+        confirmButtonText: this.$t("common.confirm"),
+        cancelButtonText: this.$t("common.cancel"),
+        type: "warning"
+      })
+          .then(() => {
+            const ids = this.selection.map(u => u.id);
+            this.delete(ids);
+          })
+          .catch(() => {
+            this.clearSelections();
+          });
+    },
+    clearSelections() {
+      this.$refs.table.clearSelection();
+    },
+    delete(ids) {
+      cameraApi.delete(ids).then(response => {
+        const res = response.data;
+        if (res.isSuccess) {
+          this.$message({
+            message: this.$t("tips.deleteSuccess"),
+            type: "success"
+          });
+        }
+        this.search();
+      });
+    },
+    add() {
+      this.dialog.type = "add";
+      this.dialog.isVisible = true;
+      this.$refs.edit.setencState(false);
+    },
+    copy(row) {
+      row.id = null;
+      this.$refs.edit.setencState(row);
+      this.dialog.type = "copy";
+      this.dialog.isVisible = true;
+    },
+    edit(row) {
+      this.$refs.edit.setencState(row);
+      this.dialog.type = "edit";
+      this.dialog.isVisible = true;
+    },
+    fetch(params = {}) {
+      this.loading = true;
+      if (this.queryParams.timeRange) {
+        this.queryParams.extra.createTime_st = this.queryParams.timeRange[0];
+        this.queryParams.extra.createTime_ed = this.queryParams.timeRange[1];
       }
 
+      this.queryParams.current = params.current ? params.current : this.queryParams.current;
+      this.queryParams.size = params.size ? params.size : this.queryParams.size;
+
+
+      cameraApi.page(this.queryParams).then(response => {
+        const res = response.data;
+        if (res.isSuccess) {
+          this.tableData = res.data;
+        }
+      }).finally(() => this.loading = false);
+    },
+    sortChange(val) {
+      this.queryParams.sort = val.prop;
+      this.queryParams.order = val.order;
+      if (this.queryParams.sort) {
+        this.search();
+      }
+    },
+    filterChange(filters) {
+      for (const key in filters) {
+        if (key.includes('.')) {
+          const val = {};
+          val[key.split('.')[1]] = filters[key][0];
+          this.queryParams.model[key.split('.')[0]] = val;
+        } else {
+          this.queryParams.model[key] = filters[key][0]
+        }
+      }
+      this.search()
+    },
+    cellClick (row, column) {
+      if (column['columnKey'] === "operation") {
+        return;
+      }
+      let flag = false;
+      this.selection.forEach((item) => {
+        if (item.id === row.id) {
+          flag = true;
+          this.$refs.table.toggleRowSelection(row);
+        }
+      })
+
+      if (!flag) {
+        this.$refs.table.toggleRowSelection(row, true);
+      }
+    }
   }
-}
+};
 </script>
+<style lang="scss" scoped></style>

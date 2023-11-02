@@ -36,6 +36,7 @@
     "increase-memory-limit": "^1.0.7",
     "jsonlint": "1.6.3",
     "jszip": "3.2.1",
+    "leader-line": "^1.0.7",
     "moment": "^2.29.4",
     "mqtt": "^5.0.3",
     "normalize.css": "7.0.0",
