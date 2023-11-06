@@ -59,27 +59,29 @@
                 align="right">
               </el-date-picker>
             </el-row>
-          <div :id="index"
+          <div
             v-for="(item, index) in cameraPos"
             :key="index"
             class="cameraDiv"
             :style="{left:item[0] + 'px', top:item[1] + 'px'}"
+            :id="index"
             >
             <el-popover
-            placement="top-start"
-            title=""
-            width="200"
-            trigger="click"
-            >
-              <i icon="el-icon-video-camera-solid"></i>
-              <el-button
-                slot="reference"
-                class="camera"
-                circle=""
-                icon="el-icon-video-camera-solid"
-                >
-              </el-button>
-            </el-popover>
+              placement="top-start"
+              title=""
+              width="200"
+              trigger="click"
+              
+              >
+                <i icon="el-icon-video-camera-solid"></i>
+                <el-button
+                  slot="reference"
+                  class="camera"
+                  circle
+                  icon="el-icon-video-camera-solid"
+                  >
+                </el-button>
+              </el-popover>
           </div>
         </el-card>
       </el-main>
@@ -95,7 +97,6 @@ export default {
   name: 'TestComponent',
   props: {},
   data() {
-    let isTaskBegin = false
     let cameraPos = []
     let mapImageUrl = ''
     let imageList = []
@@ -117,7 +118,7 @@ export default {
     let objectPicUrl = ''
     let isSubmitStatus = false
 
-      return {isTaskBegin, cameraPos, mapImageUrl, imageList, fileList, serverUrl, taskID, taskStatus, taskIndex, progressPercent, timeout, intervalList, LeaderLine, traceImage,
+      return {cameraPos, mapImageUrl, imageList, fileList, serverUrl, taskID, taskStatus, taskIndex, progressPercent, timeout, intervalList, traceImage,
       objectImgWidth, objectImgHeight, objectPicUrl, isSubmitStatus,
       pickerOptions: {
           shortcuts: [{
@@ -153,6 +154,7 @@ export default {
   mounted(){
     this.$refs.leftMenuCard.$el.style.minheight = this.$refs.mapImage.$el.clientHeight + 'px'
   },
+
   created(){
     console.log('created')
     this.mapImageUrl = this.mapInitiation()
@@ -164,19 +166,19 @@ export default {
   methods:{
     test(){
       moment
-      console.log('time', this.timeValue)
-      console.log('start v', this.timeValue[0].valueOf())
-      console.log('end v', this.timeValue[1].valueOf())
-      console.log('test', moment(this.timeValue[0]).format('YYYY-MM-DD HH:MM:SS'))
-      console.log('before', this.isSubmitStatus)
-      this.isSubmitStatus = !this.isSubmitStatus
-      console.log('after', this.isSubmitStatus)
+      // console.log('time', this.timeValue)
+      // console.log('start v', this.timeValue[0].valueOf())
+      // console.log('end v', this.timeValue[1].valueOf())
+      // console.log('test', moment(this.timeValue[0]).format('YYYY-MM-DD HH:MM:SS'))
+      // console.log('before', this.isSubmitStatus)
+      // this.isSubmitStatus = !this.isSubmitStatus
+      // console.log('after', this.isSubmitStatus)
+      this.trackObject();
     },
 
     cameraInitiation(){
       let camera = [
         [280, 100],
-        [950, 200],
         [560, 0],
         [590, 320],
         [760, 10]
@@ -189,38 +191,45 @@ export default {
       return require('./map.png')
     },
 
-    createRandom(range, nums){
-      let uuid = ''
-      for(let i = 0; i < nums; i++){
-        let t = Math.floor(Math.random() * range)
-        uuid = uuid.concat(t.toString(10))
-      }
-      // console.log('uuid', uuid)
-
-      return uuid
-    },
-
     trackObject(){
       console.log('trackobject')
+
+      let leftToRight = [{ x: 66, y: 34}, { x: 0, y: 34}]
+      let rightToLeft = [{ x: 0, y: 34}, { x: 66, y: 34}]
+      let upTodown    = [{ x: 34, y: 67}, { x: 34, y: 0}]
+      let downToUp    = [{ x: 34, y: 0}, { x: 34, y: 67}]
+      let posOffset
       let cameraDom = [document.getElementById('0'),
-    document.getElementById('1'),
-    document.getElementById('2'),
-    document.getElementById('3'),
-    document.getElementById('4')]
+      document.getElementById('1'),
+      document.getElementById('2'),
+      document.getElementById('3'),]
 
     console.log('cameraDom', cameraDom)
 
-    let pos = [0, 3, 4, 1, 2]
-    for(let i = 0; i < 4; i++){
-      new LeaderLine(LeaderLine.pointAnchor(cameraDom[pos[i]],{
-        x: 70,
-        y: 30
-      }),
-      LeaderLine.pointAnchor(cameraDom[pos[i + 1]],{
-        x: -10,
-        y: 30
-      }),
-      {color: 'red', size: 8})
+    let pos = [0, 3, 1, 2]
+    for(let i = 0; i < pos.length - 1; i++){
+      let tmpX = cameraDom[pos[i]].offsetLeft - cameraDom[pos[i + 1]].offsetLeft
+      let tmpY = cameraDom[pos[i]].offsetTop - cameraDom[pos[i + 1]].offsetTop
+      console.log('index', i, ' X', tmpX, ' Y', tmpY)
+      if(Math.abs(tmpX) >= Math.abs(tmpY)){
+        if(tmpX > 0){
+          posOffset = rightToLeft
+        }
+        else{
+          posOffset = leftToRight
+        }
+      }
+      else{
+        if(tmpY > 0){
+          posOffset = downToUp
+        }
+        else{
+          posOffset = upTodown
+        }
+      }
+      new LeaderLine(LeaderLine.pointAnchor(cameraDom[pos[i]], posOffset[0]),
+      LeaderLine.pointAnchor(cameraDom[pos[i + 1]], posOffset[1]),
+      {color: '#338fff', size: 8})
     }
 
     console.log('down.......')
@@ -229,7 +238,7 @@ export default {
     },
 
     async uploadAttachment(params){
-      await this.$axios.post('api/file/file/anyone/upload', params,{
+      await this.$axios.post('http://192.168.1.242:8760/api/file/file/anyone/upload', params,{
         headers:{
           'Content-Type': 'multipart/form-data'
         }
@@ -239,27 +248,32 @@ export default {
       }).catch(error=>{
         console.log('error', error)
         this.isSubmitStatus = !this.isSubmitStatus
+        this.taskIndex = 0
       });
     },
 
       async releaseTask(params){
       console.log('release task', params)
-      await this.$axios.post('api/task/release/task', params, {
+      await this.$axios.post('http://192.168.1.242:8760/api/task/release/task', params, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(response=>{
         console.log('success', response)
-        this.isSubmitStatus = true
-        this.taskIndex = 1
         this.$message({
           message: '追踪任务提交成功！请勿离开当前页面否则任务失败！',
           type: 'success'
         })
-        // this.taskID.push(tmpTaskID)
+        if(!this.taskID.length){
+          this.taskID.push(response.data.data)
+        }
+        else{
+          this.taskID[0] = response.data.data
+        }
       }).catch(error=>{
         console.log('error', error)
         this.isSubmitStatus = !this.isSubmitStatus
+        this.taskIndex = 0
       });
     },
 
@@ -268,6 +282,7 @@ export default {
       console.log('tmpFileList', tmpFileList)
 
       this.isSubmitStatus = !this.isSubmitStatus
+      this.taskIndex = 1
       // 创建追踪任务前先上传追踪者图片,第一步准备接口参数
       let formData = new FormData()
       formData.append('file', tmpFileList[0].raw)
@@ -280,14 +295,13 @@ export default {
       console.log('objectPicUrl', this.objectPicUrl)
 
       // 发布任务
-      let params = {
-      'end': '2023-09-14 09:59:33',
-      'start': '2023-09-14 09:50:33',
-      'url': this.objectPicUrl
-      }
+      let params = new FormData()
+      params.append('end', '2023-09-14 09:59:33')
+      params.append('start', '2023-09-14 09:50:33')
+      params.append('url', this.objectPicUrl)
 
       await this.releaseTask(params)
-      console.log('down ...................')
+      console.log('create task down ...................')
     },
 
     statusUpdate(){
@@ -306,15 +320,22 @@ export default {
         this.trackObject()
       }
       else{
-        let t = this.getTaskResult()
-        console.log('get task', t)
+        this.getTaskResult()
+        console.log('get task down.')
       }
     },
 
     getTaskResult(){
       console.log('getTaskResult')
 
-      this.$axios.get("api/task/release/reidImgRes")
+      let params = new FormData()
+      params.append('taskId', this.taskID[0])
+
+      this.$axios.post("http://192.168.1.242:8760/api/task/release/reidImgRes", params,{
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      })
       .then(response=>{
         console.log('success................', response)
         this.taskIndex = 2
@@ -345,10 +366,6 @@ export default {
       }
 
       this.createTask(this.fileList)
-
-      // if(this.taskID.size() != 0)
-      //   this.taskID.push(tmpTaskID)
-      // }
       console.log('create down. taskID ', this.taskID)
     },
   },
@@ -389,6 +406,7 @@ export default {
   padding: 0;
 }
 
+/* camera */
 .camera{
   position: relative;
   font-size: 40px;
