@@ -11,14 +11,6 @@
 <center :style="{fontSize: fontSize }">今年访客{{yearNums}}          历史访客{{historys}}</center>
 <br/><br/><br/>
 
-
-<center :style="{fontSize: fontSize }">区域{{id}}</center>
-<center :style="{fontSize: fontSize }">区域今日访客{{areatodayVisitors}}</center>
-<center :style="{fontSize: fontSize }">区域实时人数{{areacurrentNums}}</center>
-<center :style="{fontSize: fontSize }">区域本月访客{{areamonthNums}}</center>
-<center :style="{fontSize: fontSize }">区域本年访客{{areayearNums}}</center>
-<center :style="{fontSize: fontSize }">区域历史访客{{areahistorys}}</center>
-
 <br/><br/><br/><br/><br/><br/><br/ ><br/><br/><br/>
 </div>
   </template>

@@ -266,7 +266,7 @@ export default {
 
     /* synchronize create task */
     async uploadAttachment(params){
-      await this.$axios.post('api/file/file/anyone/upload', params,{
+      await this.$axios.post('http://192.168.1.242:8760/api/file/file/anyone/upload', params,{
         headers:{
           'Content-Type': 'multipart/form-data'
         }
@@ -283,7 +283,7 @@ export default {
 
     async releaseTask(params){
       // console.log('release task', params)
-      await this.$axios.post('api/task/release/task', params, {
+      await this.$axios.post('http://192.168.1.242:8760/api/task/release/task', params, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
@@ -415,7 +415,7 @@ export default {
       let params = new FormData()
       params.append('taskId', this.taskID)
 
-      this.$axios.post("api/task/release/reidImgRes", params,{
+      this.$axios.post("http://192.168.1.242:8760/api/task/release/reidImgRes", params,{
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
